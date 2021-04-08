@@ -107,7 +107,7 @@ open class AZImagePresenterViewController: UIViewController{
     open var backgroundColor: UIColor = .white
     
     // The animation duration
-    open var animationDuration: TimeInterval = 0.2
+    open var animationDuration: TimeInterval = 0.3
     
     open var scaleOnDrag: Bool = true
     
@@ -159,6 +159,10 @@ open class AZImagePresenterViewController: UIViewController{
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+       NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
+    }
+    
     override open func loadView() {
         super.loadView()
         scrollView = PannableScrollView()
@@ -195,6 +199,7 @@ open class AZImagePresenterViewController: UIViewController{
         imageView?.image = originalImage?.image
         imageView?.contentMode = .scaleAspectFit
         imageView?.isUserInteractionEnabled = true
+        NotificationCenter.default.addObserver(self, selector: #selector(interfaceRotated), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
     open func addAction(_ action: AZPresenterAction){
@@ -292,8 +297,7 @@ open class AZImagePresenterViewController: UIViewController{
         }
     }
 
-    open override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+    @objc func interfaceRotated() {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
